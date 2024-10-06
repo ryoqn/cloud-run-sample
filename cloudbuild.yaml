@@ -1,0 +1,31 @@
+steps:
+  # build client
+  # - name: 'gcr.io/cloud-builders/gcloud'
+  #   id: 'Build Client'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^client/')' ]]; then
+  #         echo 'Building client...'
+  #         gcloud builds submit client --config=client/cloudbuild.yaml
+  #       else
+  #         echo 'No changes in client directory. Skipping client build.'
+  #       fi
+
+  # build server
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Build Server'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^server/')' ]]; then
+          echo 'Building server...'
+          gcloud builds submit server --config=server/cloudbuild.yaml
+        else
+          echo 'No changes in server directory. Skipping server build.'
+        fi
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -1,0 +1,17 @@
+steps:
+  # npm install
+  - name: "node:21"
+    entrypoint: "npm"
+    args: ["install"]
+
+  # npm build
+  - name: "node:21"
+    entrypoint: "npm"
+    args: ["run", "build"]
+
+  # upload to GCS
+  - name: "gcr.io/cloud-builders/gsutil"
+    args: ["rsync", "-r", "build", "gs://YOUR_BUCKET_NAME"]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
