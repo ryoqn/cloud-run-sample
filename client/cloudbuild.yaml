@@ -1,0 +1,33 @@
+steps:
+  # echo firebase project id
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "firebase project id: $$FIREBASE_PROJECT_ID"
+    # 環境変数は$ではなく$$で参照する/Environment variables are referenced by $$, not $.
+    # $はCloud Buildの変数を置換するために使われる/$ is used to substitute Cloud Build variables.
+    env:
+      - 'FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID'
+
+  # npm install
+  - name: "node:21"
+    entrypoint: "npm"
+    args: ["install"]
+
+  # npm build
+  - name: "node:21"
+    entrypoint: "npm"
+    args: ["run", "build"]
+
+  # Firebase Deploy
+  - name: gcr.io/${PROJECT_ID}/firebase
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        firebase deploy --project=$_FIREBASE_PROJECT_ID --only=hosting
+
+options:
+  logging: CLOUD_LOGGING_ONLY

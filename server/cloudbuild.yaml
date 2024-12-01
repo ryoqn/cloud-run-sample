@@ -1,0 +1,55 @@
+steps:
+  # 動的ビルドIDの生成
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "BUILD_ID=$(date +%Y%m%d-%H%M%S)-$BUILD_ID" > /workspace/build_id.txt
+        echo "Generated BUILD_ID: $(cat /workspace/build_id.txt)"
+
+  # npm install
+  - name: 'node:21'
+    entrypoint: 'npm'
+    args: ['install']
+
+  # npm build
+  - name: 'node:21'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+
+  # Docker Build
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        docker build -t asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample/image:$BUILD_ID -f /workspace/Dockerfile /workspace
+
+  # Docker Push
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        docker push asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample/image:$BUILD_ID
+
+  # Deploy
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        gcloud run deploy cloud-run-sample \
+          --image asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample/image:$BUILD_ID \
+          --platform managed \
+          --region asia-northeast2
+
+images:
+  - 'asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample/image'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
