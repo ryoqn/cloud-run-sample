@@ -1,5 +1,5 @@
 {
-  "name": "cloud-run-sample",
+  "name": "cloud-run-sample-server",
   "version": "1.0.0",
   "description": "cloud-run-sample-node",
   "main": "index.js",
