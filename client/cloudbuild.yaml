@@ -27,6 +27,7 @@ steps:
     args:
       - "-c"
       - |
+        firebase experiments:enable webframeworks && \
         firebase deploy --project=$_FIREBASE_PROJECT_ID --only=hosting
 
 options:
