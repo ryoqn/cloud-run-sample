@@ -7,15 +7,6 @@ resource "google_firebase_hosting_site" "static_contents" {
 resource "google_firebase_hosting_version" "static_contents" {
   provider = google-beta
   site_id  = var.site_id
-  config {
-    rewrites {
-      glob = "/hello/**"
-      run {
-        service_id = var.service_name
-        region     = var.region
-      }
-    }
-  }
 }
 
 resource "google_firebase_hosting_release" "static_contents" {
