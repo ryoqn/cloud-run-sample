@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.get("/hello", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("Hello from TypeScript on Cloud Run!!");
 });
 
