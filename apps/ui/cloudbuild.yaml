@@ -1,0 +1,41 @@
+steps:
+  # echo firebase project id
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "firebase project id: $$FIREBASE_PROJECT_ID"
+    # 環境変数は$ではなく$$で参照する/Environment variables are referenced by $$, not $.
+    # $はCloud Buildの変数を置換するために使われる/$ is used to substitute Cloud Build variables.
+    env:
+      - 'FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID'
+
+  # pnpm install, build
+  - name: "node:21"
+    id: 'pnpm install and build'
+    entrypoint: "bash"
+    args:
+      - '-c'
+      - |
+        echo "Installing pnpm..."
+        npm install -g pnpm
+        echo "pnpm installed successfully."
+        echo "Running pnpm install..."
+        pnpm install && \
+        echo "pnpm install completed." && \
+        echo "Running pnpm run build..." && \
+        pnpm run build && \
+        echo "pnpm run build completed."
+
+  # Firebase Deploy
+  - name: gcr.io/${PROJECT_ID}/firebase
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        firebase experiments:enable webframeworks && \
+        firebase deploy --project=$_FIREBASE_PROJECT_ID --only=hosting
+
+options:
+  logging: CLOUD_LOGGING_ONLY

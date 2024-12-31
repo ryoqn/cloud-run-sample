@@ -1,0 +1,17 @@
+# .gcloudignore
+
+# Ignore Terraform files
+terraform/
+
+# Ignore Markdown files
+*.md
+
+# Ignore text files
+*.txt
+
+# Ignore specific files
+.gitignore
+LICENSE
+
+# Ignore node_modules in all directories
+**/node_modules/

@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api{,/**}",
+        "run": {
+          "serviceId": "cloud-run-sample-bff",
+          "region": "asia-northeast2"
+        }
+      }
+    ]
+  }
+}

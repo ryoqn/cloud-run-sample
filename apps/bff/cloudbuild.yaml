@@ -1,0 +1,71 @@
+steps:
+  # 動的ビルドIDの生成
+  - name: 'ubuntu'
+    id: 'List Workspace'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Workspace directory structure:"
+        ls -R /workspace
+
+  - name: "ubuntu"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "BUILD_ID=$(date +%Y%m%d-%H%M%S)-$BUILD_ID" > /workspace/build_id.txt
+        echo "Generated BUILD_ID: $(cat /workspace/build_id.txt)"
+
+  # pnpm install, build
+  - name: "node:21"
+    id: 'pnpm install and build'
+    entrypoint: "bash"
+    args:
+      - '-c'
+      - |
+        echo "Installing pnpm..."
+        npm install -g pnpm
+        echo "pnpm installed successfully."
+        echo "Running pnpm install..."
+        pnpm install && \
+        echo "pnpm install completed." && \
+        echo "Running pnpm run build..." && \
+        pnpm run build && \
+        echo "pnpm run build completed."
+
+  # Docker Build
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        docker build -t asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID -f ./Dockerfile .
+
+  # Docker Push
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        docker push asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID
+
+  # Deploy
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        BUILD_ID=$(cat /workspace/build_id.txt)
+        gcloud run deploy cloud-run-sample-bff \
+          --image asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID \
+          --platform managed \
+          --region asia-northeast2
+
+images:
+  - "asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

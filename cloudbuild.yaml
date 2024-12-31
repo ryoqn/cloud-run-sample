@@ -1,0 +1,44 @@
+steps:
+  # ui
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Build ui'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/ui/')' ]]; then
+          echo 'Building ui...'
+          gcloud builds submit apps/ui --config=apps/ui/cloudbuild.yaml --substitutions=_FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID
+        else
+          echo 'No changes in ui directory. Skipping ui build.'
+        fi
+  # bff
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Build bff'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/bff/')' ]]; then
+          echo 'Building bff...'
+          gcloud builds submit apps/bff --config=apps/bff/cloudbuild.yaml
+        else
+          echo 'No changes in bff directory. Skipping bff build.'
+        fi
+
+  # api
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Build api'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/api/')' ]]; then
+          echo 'Building api...'
+          gcloud builds submit apps/api --config=apps/api/cloudbuild.yaml
+        else
+          echo 'No changes in api directory. Skipping api build.'
+        fi
+
+options:
+  logging: CLOUD_LOGGING_ONLY
