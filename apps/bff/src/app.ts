@@ -4,7 +4,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.get("/api", (req, res) => {
-  res.send("Hello from TypeScript on Cloud Run!!");
+  res.send("API server running on Cloud Run!!");
 });
 
 app.listen(port, () => {
