@@ -1,4 +1,17 @@
 steps:
+  # 完全なリポジトリをフェッチ
+  - name: 'gcr.io/cloud-builders/git'
+    id: 'Fetch repository'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # デフォルトのシャロークローンを完全なクローンに変換
+        git fetch --unshallow || true
+        # 変更されたファイルを表示（デバッグ用）
+        echo "Changed files:"
+        git diff --name-only HEAD~1 HEAD || echo "Failed to get diff"
+
   # ui
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'Build ui'
@@ -6,7 +19,8 @@ steps:
     args:
       - '-c'
       - |
-        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/ui/')' ]]; then
+        # HEAD~1との比較に変更
+        if [[ -n "$(git diff --name-only HEAD~1 HEAD | grep -E '^apps/ui/')" ]]; then
           echo 'Building ui...'
           gcloud builds submit apps/ui --config=apps/ui/cloudbuild.yaml --substitutions=_FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID
         else
@@ -19,7 +33,7 @@ steps:
     args:
       - '-c'
       - |
-        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/bff/')' ]]; then
+        if [[ -n "$(git diff --name-only "${COMMIT_SHA}^..${COMMIT_SHA}" | grep -E '^apps/bff/')" ]]; then
           echo 'Building bff...'
           gcloud builds submit apps/bff --config=apps/bff/cloudbuild.yaml
         else
@@ -33,7 +47,7 @@ steps:
     args:
       - '-c'
       - |
-        if [[ -n '$(git diff --name-only $COMMIT_SHA^..$COMMIT_SHA | grep '^apps/api/')' ]]; then
+        if [[ -n "$(git diff --name-only "${COMMIT_SHA}^..${COMMIT_SHA}" | grep -E '^apps/api/')" ]]; then
           echo 'Building api...'
           gcloud builds submit apps/api --config=apps/api/cloudbuild.yaml
         else
