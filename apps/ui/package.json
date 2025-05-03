@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "emulators": "next build && firebase emulators:start --only auth,hosting",
+    "emulators": "next build && firebase emulators:start --only auth,hosting --import firebase-data --export-on-exit",
     "build:watch": "tsc --watch --preserveWatchOutput",
     "build": "next build",
     "start": "next start",

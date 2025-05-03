@@ -22,9 +22,7 @@
   },
   "emulators": {
     "auth": {
-      "port": 9099,
-      "export-on-exit": "./firebase-data/auth",
-      "import-on-startup": "./firebase-data/auth"
+      "port": 9099
     },
     "hosting": {
       "port": 5001
