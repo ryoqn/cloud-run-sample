@@ -6,11 +6,10 @@ steps:
     args:
       - '-c'
       - |
-        # デフォルトのシャロークローンを完全なクローンに変換
         git fetch --unshallow || true
-        # 変更されたファイルを表示（デバッグ用）
+        # 変更されたファイル一覧
         echo "Changed files:"
-        git diff --name-only HEAD~1 HEAD || echo "Failed to get diff"
+        git diff --name-only "${COMMIT_SHA}^..${COMMIT_SHA}" || ech o "Failed to get diff"
 
   # ui
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -19,8 +18,7 @@ steps:
     args:
       - '-c'
       - |
-        # HEAD~1との比較に変更
-        if [[ -n "$(git diff --name-only HEAD~1 HEAD | grep -E '^apps/ui/')" ]]; then
+        if [[ -n "$(git diff --name-only "${COMMIT_SHA}^..${COMMIT_SHA}" | grep -E '^apps/ui/')" ]]; then
           echo 'Building ui...'
           gcloud builds submit apps/ui --config=apps/ui/cloudbuild.yaml --substitutions=_FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID
         else
