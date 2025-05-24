@@ -5,7 +5,8 @@ import {
   User, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
@@ -39,6 +40,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(false);
     });
 
+    // リダイレクト結果のチェック（エラーハンドリング強化）
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          // 認証成功時の処理は onAuthStateChanged で自動的に処理される
+        }
+      } catch (error: any) {
+        console.error('❌ Google認証エラー:', error);
+        
+        // CORSエラーの場合は詳細ログ
+        if (error.code === 'auth/cancelled-popup-request' || 
+            error.message.includes('Cross-Origin-Opener-Policy')) {
+          console.log('🔄 CORS/ポップアップエラー - リダイレクト認証は正常に機能します');
+        }
+      }
+    };
+
+    checkRedirectResult();
     return unsubscribe;
   }, []);
 
@@ -51,8 +71,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      
+      // 追加のスコープ設定（オプション）
+      provider.addScope('email');
+      provider.addScope('profile');
+      
+      // カスタムパラメータ設定（オプション）
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
+      await signInWithRedirect(auth, provider);
+      
+    } catch (error: any) {
+      console.error('❌ Google認証開始エラー:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
