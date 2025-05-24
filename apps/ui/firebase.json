@@ -16,7 +16,7 @@
       },
       {
         "source": "**",
-        "destination": "/404.html"
+        "destination": "/index.html"
       }
     ]
   },
@@ -25,7 +25,7 @@
       "port": 9099
     },
     "hosting": {
-      "port": 5001
+      "port": 5002
     },
     "ui": {
       "enabled": true,

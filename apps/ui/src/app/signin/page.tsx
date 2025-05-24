@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Container, Heading, VStack } from '@chakra-ui/react'
-import { GoogleSignInForm } from '@/components/forms/auth/google-sign-in'
+import { GoogleSignInForm } from '@/components/features/auth/GoogleSignIn/GoogleSignIn'
 import { useEffect } from 'react'
 import { handleRedirectResult } from '@/lib/firebase/auth'
 import { redirect } from 'next/navigation'
