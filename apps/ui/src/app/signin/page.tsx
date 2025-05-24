@@ -1,36 +1,43 @@
 'use client'
 
-import { Box, Container, Heading, VStack } from '@chakra-ui/react'
-import { GoogleSignInForm } from '@/components/features/auth/GoogleSignIn/GoogleSignIn'
-import { useEffect } from 'react'
-import { handleRedirectResult } from '@/lib/firebase/auth'
-import { redirect } from 'next/navigation'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts'
+import { UnifiedAuthForm } from '@/components/auth/UnifiedAuthForm'
+import { Center, Spinner, Box } from '@chakra-ui/react'
 
-export default function SignupPage() {
+export default function SignInPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
   useEffect(() => {
-    const handleAuth = async () => {
-      const user = await handleRedirectResult()
-      if (user) {
-        redirect('/home')
-      } else {
-        console.log('No user signed in')
-      }
+    if (!loading && user) {
+      router.push('/home')
     }
-    handleAuth()
-  }, [])
-  return (
-    <Container
-      height="100vh"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <Box width="100%" maxWidth="400px">
-        <VStack align="stretch">
-          <Heading size="lg">Sign In</Heading>
-          <GoogleSignInForm />
-        </VStack>
-      </Box>
-    </Container>
-  )
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <Center height="100vh">
+        <Box textAlign="center">
+          <Spinner size="xl" />
+          <Box mt={4}>認証状態を確認中...</Box>
+        </Box>
+      </Center>
+    )
+  }
+
+  // 認証済みの場合（リダイレクト中）
+  if (user) {
+    return (
+      <Center height="100vh">
+        <Box textAlign="center">
+          <Spinner size="xl" />
+          <Box mt={4}>ホームページに移動中...</Box>
+        </Box>
+      </Center>
+    )
+  }
+
+  return <UnifiedAuthForm />
 }

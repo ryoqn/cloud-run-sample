@@ -1,4 +1,5 @@
-import { Sidebar } from '@/components/layout/Sidebar'
+import { AuthProvider } from '@/contexts'
+import { AuthLayoutManager } from '@/components/auth/AuthLayoutManager'
 import { Provider } from '@/components/ui/provider'
 
 export default function RootLayout({
@@ -10,7 +11,11 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body>
         <Provider>
-          <Sidebar>{children}</Sidebar>
+          <AuthProvider>
+            <AuthLayoutManager>
+              {children}
+            </AuthLayoutManager>
+          </AuthProvider>
         </Provider>
       </body>
     </html>
