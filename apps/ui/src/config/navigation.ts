@@ -1,23 +1,34 @@
 // src/config/navigation.ts
 import {
   FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
-import { AiFillProfile } from 'react-icons/ai'
 import { BiSolidBolt } from 'react-icons/bi'
 
-interface LinkItemProps {
+export interface LinkItemProps {
   name: string
   icon: IconType
   href: string
+  requiresAuth?: boolean
 }
 
-export const sidebarLinks: Array<LinkItemProps> = [
+// パブリックリンク
+export const publicLinks: LinkItemProps[] = [
   { name: 'ホーム', icon: FiHome, href: '/home' },
-  { name: 'サインイン', icon: FiSettings, href: '/signin' },
-  { name: 'サンプル', icon: BiSolidBolt, href: '/sample' },
 ]
+
+// ゲストリンク（未認証ユーザー向け）
+export const guestLinks: LinkItemProps[] = []
+
+// 認証済みユーザー向けのリンク
+export const authenticatedLinks: LinkItemProps[] = [
+  { name: 'サンプル', icon: BiSolidBolt, href: '/sample', requiresAuth: true },
+]
+
+// 認証状態に応じたリンクを取得
+export const getNavigationLinks = (isAuthenticated: boolean): LinkItemProps[] => {
+  return [
+    ...publicLinks,
+    ...(isAuthenticated ? authenticatedLinks : guestLinks)
+  ]
+}
