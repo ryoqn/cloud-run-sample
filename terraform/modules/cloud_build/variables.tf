@@ -54,3 +54,38 @@ variable "firebase_project_id" {
   description = "The ID of the Firebase project"
   type        = string
 }
+
+variable "firebase_api_key" {
+  description = "The Firebase API key"
+  type        = string
+}
+
+variable "firebase_auth_domain" {
+  description = "The Firebase auth domain"
+  type        = string
+}
+
+variable "firebase_storage_bucket" {
+  description = "The Firebase storage bucket"
+  type        = string
+}
+
+variable "firebase_messaging_sender_id" {
+  description = "The Firebase messaging sender ID"
+  type        = string
+}
+
+variable "firebase_app_id" {
+  description = "The Firebase app ID"
+  type        = string
+}
+
+variable "firebase_measurement_id" {
+  description = "The Firebase measurement ID"
+  type        = string
+}
+
+variable "api_server_url" {
+  description = "The URL of the API server"
+  type        = string
+}

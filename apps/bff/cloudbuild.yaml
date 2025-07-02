@@ -9,18 +9,18 @@ steps:
         echo "Workspace directory structure:"
         ls -R /workspace
 
-  - name: "ubuntu"
-    entrypoint: "bash"
+  - name: 'ubuntu'
+    entrypoint: 'bash'
     args:
-      - "-c"
+      - '-c'
       - |
         echo "BUILD_ID=$(date +%Y%m%d-%H%M%S)-$BUILD_ID" > /workspace/build_id.txt
         echo "Generated BUILD_ID: $(cat /workspace/build_id.txt)"
 
   # pnpm install, build
-  - name: "node:21"
+  - name: 'node:21'
     id: 'pnpm install and build'
-    entrypoint: "bash"
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
@@ -35,37 +35,40 @@ steps:
         echo "pnpm run build completed."
 
   # Docker Build
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     args:
-      - "-c"
+      - '-c'
       - |
         BUILD_ID=$(cat /workspace/build_id.txt)
         docker build -t asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID -f ./Dockerfile .
 
   # Docker Push
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     args:
-      - "-c"
+      - '-c'
       - |
         BUILD_ID=$(cat /workspace/build_id.txt)
         docker push asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID
 
   # Deploy
-  - name: "gcr.io/cloud-builders/gcloud"
-    entrypoint: "bash"
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     args:
-      - "-c"
+      - '-c'
       - |
         BUILD_ID=$(cat /workspace/build_id.txt)
         gcloud run deploy cloud-run-sample-bff \
           --image asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image:$BUILD_ID \
           --platform managed \
-          --region asia-northeast2
+          --region asia-northeast2 \
+          --service-account cloud-run@${PROJECT_ID}.iam.gserviceaccount.com \
+          --set-env-vars API_SERVER_URL=${_API_SERVER_URL} \
+          --set-env-vars NODE_ENV=production
 
 images:
-  - "asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image"
+  - 'asia-northeast2-docker.pkg.dev/${PROJECT_ID}/cloud-run-sample-bff/image'
 
 options:
   logging: CLOUD_LOGGING_ONLY

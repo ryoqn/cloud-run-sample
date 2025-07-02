@@ -18,15 +18,6 @@ module "cloud_run" {
   project_id   = var.project_id
 }
 
-module "cloud_storage" {
-  source = "../../modules/cloud_storage"
-
-  bucket_name   = "${local.service_name}-static-contents"
-  location      = "asia-northeast1"
-  force_destroy = true
-  cors_origins  = ["http://localhost:3000", var.app_url]
-}
-
 module "cloud_build" {
   source                            = "../../modules/cloud_build"
   region                            = local.location
@@ -40,6 +31,13 @@ module "cloud_build" {
   build_trigger_filename            = "cloudbuild.yaml"
   artifact_repository_image_name    = "${local.location}-docker.pkg.dev/${var.project_id}/${local.service_name}"
   firebase_project_id               = var.firebase_project_id
+  firebase_api_key                  = var.firebase_api_key
+  firebase_auth_domain              = var.firebase_auth_domain
+  firebase_storage_bucket           = var.firebase_storage_bucket
+  firebase_messaging_sender_id      = var.firebase_messaging_sender_id
+  firebase_app_id                   = var.firebase_app_id
+  firebase_measurement_id           = var.firebase_measurement_id
+  api_server_url                    = var.api_server_url
 }
 
 module "firebase_hosting" {

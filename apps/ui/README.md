@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+# ディレクトリ構成
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+apps/ui/
+├── src/
+│   ├── app/                  # Next.jsのApp Router用ディレクトリ
+│   │   ├── page.tsx          # ホームページ
+│   │   ├── layout.tsx        # レイアウト
+│   │   └── [route]/          # 各ルート
+│   │
+│   ├── components/           # UIコンポーネント
+│   │   ├── ui/               # 汎用UIコンポーネント
+│   │   │   ├── Button/
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Button.module.css
+│   │   │   │   └── Button.stories.tsx
+│   │   │   └── ...
+│   │   │
+│   │   ├── features/         # 機能固有のコンポーネント
+│   │   │   ├── Sample/
+│   │   │   │   ├── SampleDisplay.tsx       # プレゼンテーショナルコンポーネント
+│   │   │   │   ├── SampleContainer.tsx     # コンテナコンポーネント
+│   │   │   │   ├── SampleDisplay.module.css
+│   │   │   │   └── SampleDisplay.stories.tsx
+│   │   │   └── ...
+│   │   │
+│   │   └── layout/           # レイアウト関連コンポーネント
+│   │       ├── Header/
+│   │       ├── Footer/
+│   │       └── ...
+│   │
+│   ├── lib/                  # ユーティリティとカスタムフック
+│   │   ├── api/              # APIリクエスト関連
+│   │   │   ├── hooks/        # データ取得用カスタムフック
+│   │   │   │   ├── useSample.ts
+│   │   │   │   └── ...
+│   │   │   │
+│   │   │   └── services/     # APIサービス
+│   │   │       ├── sampleService.ts
+│   │   │       └── ...
+│   │   │
+│   │   ├── utils/            # 汎用ユーティリティ
+│   │   └── firebase/         # Firebase関連コード
+│   │
+│   ├── types/                # 型定義
+│   │   ├── index.ts          # 型のエクスポート
+│   │   └── sample.ts         # モデル固有の型
+│   │
+│   ├── styles/               # グローバルスタイル
+│   │   ├── globals.css
+│   │   └── variables.css
+│   │
+│   └── stories/              # Storybook用のページストーリー
+│       └── pages/
+│
+├── .storybook/              # Storybook設定
+│   ├── main.ts
+│   └── preview.ts
+│
+└── public/                  # 静的アセット
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -1,20 +1,19 @@
 steps:
-  # echo firebase project id
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "firebase project id: $$FIREBASE_PROJECT_ID"
-    # 環境変数は$ではなく$$で参照する/Environment variables are referenced by $$, not $.
-    # $はCloud Buildの変数を置換するために使われる/$ is used to substitute Cloud Build variables.
-    env:
-      - 'FIREBASE_PROJECT_ID=$_FIREBASE_PROJECT_ID'
-
+  # 環境変数は$ではなく$$で参照する。/Environment variables are referenced by $$, not $.
+  # $はCloud Buildの変数を置換するために使われる。/$ is used to substitute Cloud Build variables.
   # pnpm install, build
   - name: "node:21"
     id: 'pnpm install and build'
     entrypoint: "bash"
+    env:
+      - "FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}"
+      - "NEXT_PUBLIC_FIREBASE_API_KEY=${_NEXT_PUBLIC_FIREBASE_API_KEY}"
+      - "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${_NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}"
+      - "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${_NEXT_PUBLIC_FIREBASE_PROJECT_ID}"
+      - "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${_NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}"
+      - "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${_NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}"
+      - "NEXT_PUBLIC_FIREBASE_APP_ID=${_NEXT_PUBLIC_FIREBASE_APP_ID}"
+      - "NEXT_PUBLIC_MEASUREMENT_ID=${_NEXT_PUBLIC_MEASUREMENT_ID}"
     args:
       - '-c'
       - |
@@ -22,7 +21,7 @@ steps:
         npm install -g pnpm
         echo "pnpm installed successfully."
         echo "Running pnpm install..."
-        pnpm install && \
+        pnpm install --frozen-lockfile && \
         echo "pnpm install completed." && \
         echo "Running pnpm run build..." && \
         pnpm run build && \

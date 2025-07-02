@@ -1,5 +1,5 @@
-import * as bunyan from "bunyan";
+import * as bunyan from 'bunyan'
 
 const logger = bunyan.createLogger({
-  name: "cloud-run-typescript",
-});
+  name: 'cloud-run-sample-bff',
+})
