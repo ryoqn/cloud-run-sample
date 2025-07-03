@@ -1,7 +1,7 @@
 # Cloud Run Sample
 
 このプロジェクトは Google Cloud Platform の Cloud Run を活用した Web アプリケーションサンプルです。
-Next.js フロントエンド (UI)、Express.js バックエンド (BFF)、および Go 言語で書かれた API サーバーで構成されています。
+Next.js フロントエンド (UI)、Express.js バックエンド (BFF)、および Go 言語で書かれた API サーバーで構成しています。
 
 ## 技術スタック
 
@@ -18,6 +18,37 @@ Next.js フロントエンド (UI)、Express.js バックエンド (BFF)、お�
   - Cloud Build
   - Terraform
 - **パッケージマネージャー**: pnpm v9.15
+
+## 認証
+### セキュリティ構成
+  - Frontend: Firebase Hostingでホスティング、FirebaseAuthenticationにてクライアント認証
+  - BFF: Cloud Run (--allow-unauthenticated)
+  - API: Cloud Run (--no-allow-unauthenticated)
+  - BFF→API間はGCP認証で保護
+### 認証フロー
+```mermaid
+sequenceDiagram
+    participant User as ユーザー
+    participant FH as Firebase Hosting<br/>(Frontend)
+    participant FA as Firebase Auth
+    participant BFF as BFF Server<br/>(Cloud Run)
+    participant API as API Server<br/>(Cloud Run)
+
+    %% 初期アクセスと認証
+    User->>FH: ① アプリケーションにアクセス
+    FH->>User: ② Next.jsアプリを返却
+    User->>FA: ③ Googleアカウントでログイン
+    FA->>User: ④ Firebase IDトークンを返却
+
+    %% APIリクエストフロー
+    User->>BFF: ⑤ APIリクエスト (Authorization: Bearer <Firebase IDトークン>)
+
+    %% APIサーバーへのプロキシ
+    BFF->>API: ⑥ プロキシリクエスト(Authorization: Bearer <GCPトークン>)
+    API->>BFF: ⑦ APIレスポンスを返却
+
+    BFF->>User: ⑭ レスポンスを返却
+```
 
 ## プロジェクト構造
 
@@ -36,7 +67,7 @@ cloud-run-sample/
 
 ### 前提条件
 
-- Node.js v21 以上 (nodenv などでバージョン管理を推奨)
+- Node.js v21 以上
 - pnpm v9 以上
 - Google Cloud SDK
 - Firebase CLI
@@ -90,6 +121,36 @@ firebase init emulators
 cd apps/ui
 pnpm run emulators
 ```
+3. BFFのローカルサーバーを起動:
+
+```bash
+cd apps/bff
+pnpm run dev
+```
+4. APIのローカルサーバーを起動:
+
+```bash
+cd apps/api
+go run main.go
+```
+
+**注意事項** ：ローカルではローカルのBFFサーバーにFirebaseエミュレーターを使って接続出来ないので、firebase.jsonの`rewrites`の下記部分をコメントして実行する必要があります。Frontendから直接BFFサーバーにアクセスしています。
+
+```json
+"rewrites": [
+      // {
+      //   "source": "/api{,/**}",
+      //   "run": {
+      //     "serviceId": "cloud-run-sample-bff",
+      //     "region": "asia-northeast2"
+      //   }
+      // },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+```
 
 ### デプロイ
 
@@ -113,16 +174,9 @@ terraform apply
 git push origin main
 ```
 
-## 機能
-
-- Google アカウントを使用したユーザー認証
-- BFF を介した API サービスの呼び出し
-- Cloud Build による CI/CD パイプライン
-- Firebase Hosting によるフロントエンドのホスティング
-
 ## CI/CD パイプライン
 
-プロジェクトは Cloud Build を使用して CI/CD パイプラインを実装しています。`main` ブランチへのプッシュにより、以下の処理が自動的に実行されます:
+このプロジェクトは Cloud Build を使用して CI/CD パイプラインを実装しています。`main` ブランチへのプッシュにより、以下の処理が自動的に実行されます:
 
 1. フロントエンドのビルドとデプロイ (Firebase Hosting)
 2. BFF のビルドと Cloud Run へのデプロイ
